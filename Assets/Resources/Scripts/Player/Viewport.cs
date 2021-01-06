@@ -7,7 +7,6 @@ public class Viewport : MonoBehaviour
 {
     private bool XREnabled;
     private InputDevice headset;
-    private Vector3 initialPosition;
     private float angle = 0f;
     void Start()
     {
@@ -24,7 +23,6 @@ public class Viewport : MonoBehaviour
             return;
         }
         headset.subsystem.TryRecenter();
-        headset.TryGetFeatureValue(CommonUsages.devicePosition, out initialPosition);
     }
 
     private void XRInit() {
@@ -40,7 +38,7 @@ public class Viewport : MonoBehaviour
         headset.TryGetFeatureValue(CommonUsages.devicePosition, out position);
         headset.TryGetFeatureValue(CommonUsages.deviceRotation, out rotation);
         this.transform.localRotation = rotation;
-        this.transform.localPosition = position - initialPosition;
+        this.transform.localPosition = position;
     }
 
     private void flatUpdate() {

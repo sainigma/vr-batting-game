@@ -14,10 +14,9 @@ public class setCenterOfGravity : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = cog;
     }
-
-
 }
 
+/*
 [CustomEditor(typeof(setCenterOfGravity))]
 public class EditorHelpers : Editor {
     void OnSceneGUI() {
@@ -31,3 +30,4 @@ public class EditorHelpers : Editor {
         }
     }
 }
+*/
