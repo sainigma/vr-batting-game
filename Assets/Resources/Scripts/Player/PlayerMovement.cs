@@ -40,9 +40,9 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public void rotate(Vector2 rotation) {
-        this.transform.Rotate(new Vector3(0, rotation.x * maxRotationSpeed, 0), Space.Self);
+        this.transform.Rotate(new Vector3(0, rotation.x * maxRotationSpeed * Time.deltaTime, 0), Space.Self);
         if (!XREnabled) {
-            viewport.setAngle(rotation.y * maxRotationSpeed);
+            viewport.setAngle(rotation.y * maxRotationSpeed * Time.deltaTime);
         }
     }
 

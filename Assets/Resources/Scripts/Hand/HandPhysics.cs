@@ -8,9 +8,11 @@ public class HandPhysics : MonoBehaviour
     private XRHand handController;
     private Rigidbody rb;
     private float gripStrength;
+    private bool right;
     void Start() {
         rb = GetComponent<Rigidbody>();
         handController = handTarget.GetComponent<XRHand>();
+        right = handController.isRight();
     }
 
     void FixedUpdate() {
@@ -20,12 +22,7 @@ public class HandPhysics : MonoBehaviour
     }
 
     public Vector3 getPosition() {
-        return getPosition(new Vector3(0,0,0));
-    }
-
-    public Vector3 getPosition(Vector3 offset) {
-        Vector3 position = handTarget.transform.TransformPoint(offset);
-        return position;
+        return handTarget.transform.position;
     }
 
     public Quaternion getRotation() {
@@ -34,5 +31,9 @@ public class HandPhysics : MonoBehaviour
 
     public float getGrip() {
         return gripStrength;
+    }
+
+    public bool isRight() {
+        return right;
     }
 }

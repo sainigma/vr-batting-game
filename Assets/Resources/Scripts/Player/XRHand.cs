@@ -39,4 +39,8 @@ public class XRHand : MonoBehaviour
         hand.TryGetFeatureValue(CommonUsages.grip, out grip);
         return grip;
     }
+
+    public bool isRight() {
+        return !left;
+    }
 }
