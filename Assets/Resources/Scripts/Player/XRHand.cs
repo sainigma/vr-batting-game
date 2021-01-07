@@ -33,4 +33,10 @@ public class XRHand : MonoBehaviour
         this.transform.localRotation = rotation;
         this.transform.localPosition = position;
     }
+
+    public float getGrip() {
+        float grip;
+        hand.TryGetFeatureValue(CommonUsages.grip, out grip);
+        return grip;
+    }
 }
