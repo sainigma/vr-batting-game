@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class TwoHandedInteractable : MonoBehaviour
 {
-    public GameObject tempShit;
-    public GameObject tempShit2;
     private HandPhysics dominantHand;
     private HandPhysics secondaryHand;
     private int originalPhysicsLayer;
@@ -13,15 +11,15 @@ public class TwoHandedInteractable : MonoBehaviour
     private Rigidbody rb;
     public Vector3 rotationOffset;
     private Quaternion rotationOffsetQ;
+    private XRUtils xrUtils;
     private float fulcrumOffset;
     private bool right = true;
 
     void Start() {
+        xrUtils = new XRUtils();
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = 20f;
         rotationOffsetQ = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
-        addHand(tempShit);
-        addHand(tempShit2);
     }
 
     private void swapDominant() {
@@ -40,8 +38,11 @@ public class TwoHandedInteractable : MonoBehaviour
     }
 
     private void checkSecondaryPosition() {
-        if ((dominantHand.getPosition() - secondaryHand.getPosition()).magnitude > Mathf.Abs(fulcrumOffset)) {
-            //popHand();
+        float a = (dominantHand.getPosition() - secondaryHand.getPosition()).magnitude;
+        float b = Mathf.Abs(fulcrumOffset);
+        if (a > b && right) {
+            Debug.Log(a+" ja "+b);
+            popHand();
         }
     }
 
@@ -50,16 +51,18 @@ public class TwoHandedInteractable : MonoBehaviour
             Vector3 position;
             Quaternion rotation;
             Vector3 direction;
-            if (secondaryHand != null) {
-                checkSecondaryPosition();
-            }
+            Vector3 helper = dominantHand.transform.right;
+
             if (secondaryHand == null) {
                 position = dominantHand.getPosition();
                 direction = dominantHand.transform.up;
-                rotation = Quaternion.LookRotation(direction, dominantHand.transform.right);
+                rotation = Quaternion.LookRotation(direction, helper);
+                if (dominantHand.getGrip() < 0.1f) {
+                    popHand();
+                }
+                //rotation = rotation * rotationOffsetQ;
             } else {
                 swapDominant();
-                Vector3 helper = dominantHand.transform.right;
                 position = dominantHand.getPosition();
                 Vector3 secondaryPosition = secondaryHand.getPosition();
                 rotation = position - secondaryPosition != Vector3.zero 
@@ -68,60 +71,48 @@ public class TwoHandedInteractable : MonoBehaviour
                         : Quaternion.LookRotation(secondaryPosition - position, helper)
                     : dominantHand.getRotation();
                 direction = (position - secondaryHand.getPosition()).normalized;
-            }
-            position += direction * (-fulcrumOffset);
-            rotation = rotation * rotationOffsetQ;
-            if (rb.isKinematic) {
-                rb.MoveRotation(rotation);
-                rb.MovePosition(position);
-            } else {
-                Vector3 velocity = (position - rb.position) / Time.deltaTime;
-                rb.velocity = velocity;
-                Quaternion deltaRotation = rotation * Quaternion.Inverse(rb.rotation);
-                float rotAngle;
-                Vector3 rotAxis;
-                deltaRotation.ToAngleAxis(out rotAngle, out rotAxis);
-                if (!float.IsInfinity(rotAngle) && Mathf.Abs(rotAngle) > 0.01f) {
-                    if (rotAngle > 180f) {
-                        rotAngle -= 360f;
-                    }
-                    Vector3 angularVelocity = (0.9f * Mathf.Deg2Rad * rotAngle / Time.deltaTime) * rotAxis.normalized;
-                    rb.angularVelocity = angularVelocity;
+                if (secondaryHand != null) {
+                    checkSecondaryPosition();
                 }
             }
+            position += direction * (-fulcrumOffset);
+            xrUtils.TransformRigidbody(rb, position, rotation);
         }
     }
 
     private void startInteraction(GameObject hand) {
-        fulcrumOffset = 0.3f;
-        originalPhysicsLayer = this.gameObject.layer;
+        //rb.isKinematic = true;
+        originalPhysicsLayer = hand.gameObject.layer;
+        xrUtils.setPhysicsLayer(this.gameObject.layer, hand);
         interactionActive = true;
         dominantHand = hand.GetComponent<HandPhysics>();
         rb.useGravity = false;
-        this.gameObject.layer = hand.layer;
         right = true;
         //right = dominantHand.isRight();
     }
     
     private void endInteraction() {
-        fulcrumOffset = 0f;
-        this.gameObject.layer = originalPhysicsLayer;
+        //this.gameObject.layer = originalPhysicsLayer;
         interactionActive = false;
         rb.useGravity = true;
+        rb.isKinematic = false;
     }
 
-    public void addHand(GameObject hand) {
+    public void addHand(GameObject hand, Vector3 position) {
         if (interactionActive) {
             secondaryHand = hand.GetComponent<HandPhysics>();
         } else {
+            fulcrumOffset = (this.transform.position - position).magnitude;
             startInteraction(hand);
         }
     }
 
     public void popHand() {
         if (secondaryHand != null) {
+            xrUtils.setPhysicsLayer(originalPhysicsLayer, secondaryHand.gameObject);
             secondaryHand = null;
         } else {
+            xrUtils.setPhysicsLayer(originalPhysicsLayer, dominantHand.gameObject);
             dominantHand = null;
             endInteraction();
         }
