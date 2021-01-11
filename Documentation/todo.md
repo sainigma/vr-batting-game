@@ -1,8 +1,14 @@
 ## XR
  - [x] Dominant hand is decided by grip strength on two handed interactions
  - [x] Hand collision with interactable object causes interaction event when trigger is pressed
- - [ ] Move interaction layer setting to hand class
- - [ ] Spawn hands if XR mode active
+ - [x] Move interaction layer setting to hand class
+ - [x] Remove handedness from two handed interaction, determine direction of object by checking which hand is closer to origin
+ - [ ] State transition
+  - [x] Static -> one handed
+  - [x] One handed -> two handed
+  - [ ] Two handed -> one handed
+  - [ ] One handed -> static
+ - [ ] Spawn hands only if XR mode active
 
 ## Flat
  - [ ] Spawn character animator if XR mode is inactive

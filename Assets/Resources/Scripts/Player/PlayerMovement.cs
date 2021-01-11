@@ -58,12 +58,20 @@ public class PlayerMovement : MonoBehaviour
         movement = newMovement;
     }
 
+    private void checkForExit() {
+        if (playerController.UI.Quit.ReadValue<float>() > 0) {
+            Application.Quit();
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+    }
+
     void Update() {
         if (directControl) {
             Vector2 inputMovement = playerController.FirstPersonPlayer.movement.ReadValue<Vector2>();
             Vector2 inputRotation = playerController.FirstPersonPlayer.look.ReadValue<Vector2>();
             move(inputMovement);
             rotate(inputRotation);
+            checkForExit();
         } else {
             move(movement);
         }

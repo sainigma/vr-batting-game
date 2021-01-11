@@ -137,6 +137,14 @@ public class @PlayerController : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Quit"",
+                    ""type"": ""Value"",
+                    ""id"": ""94723431-b619-400a-bf98-119097bc430c"",
+                    ""expectedControlType"": ""Integer"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -148,6 +156,17 @@ public class @PlayerController : IInputActionCollection, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""EnableVR"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9effbca1-4416-4d8f-807a-ffec91cb9575"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Quit"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -163,6 +182,7 @@ public class @PlayerController : IInputActionCollection, IDisposable
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_EnableVR = m_UI.FindAction("EnableVR", throwIfNotFound: true);
+        m_UI_Quit = m_UI.FindAction("Quit", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -254,11 +274,13 @@ public class @PlayerController : IInputActionCollection, IDisposable
     private readonly InputActionMap m_UI;
     private IUIActions m_UIActionsCallbackInterface;
     private readonly InputAction m_UI_EnableVR;
+    private readonly InputAction m_UI_Quit;
     public struct UIActions
     {
         private @PlayerController m_Wrapper;
         public UIActions(@PlayerController wrapper) { m_Wrapper = wrapper; }
         public InputAction @EnableVR => m_Wrapper.m_UI_EnableVR;
+        public InputAction @Quit => m_Wrapper.m_UI_Quit;
         public InputActionMap Get() { return m_Wrapper.m_UI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -271,6 +293,9 @@ public class @PlayerController : IInputActionCollection, IDisposable
                 @EnableVR.started -= m_Wrapper.m_UIActionsCallbackInterface.OnEnableVR;
                 @EnableVR.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnEnableVR;
                 @EnableVR.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnEnableVR;
+                @Quit.started -= m_Wrapper.m_UIActionsCallbackInterface.OnQuit;
+                @Quit.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnQuit;
+                @Quit.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnQuit;
             }
             m_Wrapper.m_UIActionsCallbackInterface = instance;
             if (instance != null)
@@ -278,6 +303,9 @@ public class @PlayerController : IInputActionCollection, IDisposable
                 @EnableVR.started += instance.OnEnableVR;
                 @EnableVR.performed += instance.OnEnableVR;
                 @EnableVR.canceled += instance.OnEnableVR;
+                @Quit.started += instance.OnQuit;
+                @Quit.performed += instance.OnQuit;
+                @Quit.canceled += instance.OnQuit;
             }
         }
     }
@@ -290,5 +318,6 @@ public class @PlayerController : IInputActionCollection, IDisposable
     public interface IUIActions
     {
         void OnEnableVR(InputAction.CallbackContext context);
+        void OnQuit(InputAction.CallbackContext context);
     }
 }

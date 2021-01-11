@@ -10,10 +10,13 @@ public class HandPhysics : MonoBehaviour
     private Collider grabSphere;
     private Collision currentCollision;
     private XRUtils xrUtils;
+    private int originalLayer;
     private float gripStrength;
     private bool right;
     private bool grabbing;
+
     void Start() {
+        originalLayer = gameObject.layer;
         grabSphere = GetComponent<SphereCollider>();
         rb = GetComponent<Rigidbody>();
         xrUtils = new XRUtils();
@@ -26,16 +29,23 @@ public class HandPhysics : MonoBehaviour
         checkCollision();
     }
 
+    private void checkGrabFinished() {
+        if (grabbing && getGrip() < 0.1f) {
+            grabbing = false;
+            xrUtils.setPhysicsLayer(originalLayer, gameObject);
+        }
+    }
+
     private void checkCollision() {
         if (currentCollision == null) {
+            checkGrabFinished();
             return;
         } else if (!grabbing) {
             if (currentCollision.gameObject.tag == "Interactable" && getGrip() > 0.1f) {
+                xrUtils.setPhysicsLayer(currentCollision.gameObject.layer, gameObject);
                 currentCollision.gameObject.GetComponent<TwoHandedInteractable>().addHand(this.gameObject, currentCollision.GetContact(0).point);
                 grabbing = true;
             }
-        } else if (getGrip() < 0.1f) {
-            grabbing = false;
         }
     }
 
@@ -48,11 +58,13 @@ public class HandPhysics : MonoBehaviour
     }
 
     public Vector3 getPosition() {
-        return handTarget.transform.position;
+        return transform.position;
+        //return handTarget.transform.position;
     }
 
     public Quaternion getRotation() {
-        return handTarget.transform.rotation;
+        return transform.rotation;
+        //return handTarget.transform.rotation;
     }
 
     public float getGrip() {

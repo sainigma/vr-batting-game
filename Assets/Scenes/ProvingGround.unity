@@ -679,11 +679,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hand
       objectReference: {fileID: 0}
-    - target: {fileID: 8188565630956033917, guid: 29218c7afd4a462438179dcfac33cbbc,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29218c7afd4a462438179dcfac33cbbc, type: 3}
 --- !u!1 &1491371468
@@ -1283,11 +1278,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Hand (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 8188565630956033917, guid: 29218c7afd4a462438179dcfac33cbbc,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29218c7afd4a462438179dcfac33cbbc, type: 3}
