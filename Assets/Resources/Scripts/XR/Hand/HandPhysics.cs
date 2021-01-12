@@ -5,7 +5,7 @@ using UnityEngine;
 public class HandPhysics : MonoBehaviour
 {
     public GameObject handTarget;
-    private XRHand handController;
+    public XRHand handController;
     private Rigidbody rb;
     private Collider grabSphere;
     private Collision currentCollision;
@@ -14,19 +14,28 @@ public class HandPhysics : MonoBehaviour
     private float gripStrength;
     private bool right;
     private bool grabbing;
+    public bool ready = false;
 
     void Start() {
         originalLayer = gameObject.layer;
         grabSphere = GetComponent<SphereCollider>();
         rb = GetComponent<Rigidbody>();
         xrUtils = new XRUtils();
-        handController = handTarget.GetComponent<XRHand>();
-        right = handController.isRight();
     }
 
     void FixedUpdate() {
+        if (!ready) {
+            return;
+        }
         xrUtils.TransformRigidbody(rb, handTarget.transform.position, handTarget.transform.rotation);
         checkCollision();
+    }
+
+    public void setHandTarget(GameObject handTarget, bool isRight) {
+        this.handTarget = handTarget;
+        handController = handTarget.GetComponent<XRHand>();
+        right = isRight;
+        ready = true;
     }
 
     private void checkGrabFinished() {
@@ -43,7 +52,7 @@ public class HandPhysics : MonoBehaviour
         } else if (!grabbing) {
             if (currentCollision.gameObject.tag == "Interactable" && getGrip() > 0.1f) {
                 xrUtils.setPhysicsLayer(currentCollision.gameObject.layer, gameObject);
-                currentCollision.gameObject.GetComponent<TwoHandedInteractable>().addHand(this.gameObject, currentCollision.GetContact(0).point);
+                currentCollision.gameObject.GetComponent<TwoHandedInteractable>().addHand(this.gameObject, currentCollision.GetContact(0).point, originalLayer);
                 grabbing = true;
             }
         }

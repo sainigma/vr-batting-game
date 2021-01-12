@@ -11,13 +11,21 @@ public class TwoHandedInteractable : MonoBehaviour
     public Vector3 rotationOffset;
     private Quaternion rotationOffsetQ;
     private XRUtils xrUtils;
+    
     private float fulcrumOffset;
+
+    private int handPhysicsLayer;
+    private CollisionDetectionMode originalCollision;
+    private int originalPhysicsLayer;
+    private float timer;
 
     void Start() {
         xrUtils = new XRUtils();
         rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = 20f;
         rotationOffsetQ = Quaternion.Euler(rotationOffset.x, rotationOffset.y, rotationOffset.z);
+        originalPhysicsLayer = gameObject.layer;
+        originalCollision = rb.collisionDetectionMode;
     }
 
     private void swapDominant() {
@@ -89,23 +97,36 @@ public class TwoHandedInteractable : MonoBehaviour
             position += offset;
 
             xrUtils.TransformRigidbody(rb, position, rotation);
+        } else {
+            if (timer != -1) {
+                timer += Time.deltaTime;
+                if (timer > 0.5f) {
+                    xrUtils.setPhysicsLayer(originalPhysicsLayer, gameObject);
+                    timer = -1;
+                    rb.collisionDetectionMode = originalCollision;
+                }
+            }
         }
     }
 
     private void startInteraction(GameObject hand) {
         rb.isKinematic = false;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         interactionActive = true;
         dominantHand = hand.GetComponent<HandPhysics>();
         rb.useGravity = false;
     }
     
     private void endInteraction() {
+        xrUtils.setPhysicsLayer(handPhysicsLayer, gameObject);
         interactionActive = false;
         rb.useGravity = true;
         rb.isKinematic = false;
+        timer = 0;
     }
 
-    public void addHand(GameObject hand, Vector3 position) {
+    public void addHand(GameObject hand, Vector3 position, int handLayer) {
+        handPhysicsLayer = handLayer;
         if (interactionActive) {
             secondaryHand = hand.GetComponent<HandPhysics>();
             swapDominant(true);
